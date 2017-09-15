@@ -1,22 +1,26 @@
 FROM ubuntu:14.04
-MAINTAINER Michele Cantelli <emmekappa@gmail.com>
+MAINTAINER Heorhi Sidoryn <heorhi.sidoryn@gmail.com>
 
 # SSH username and password
-ENV SFTP_USER=sftp
-ENV SFTP_PASSWORD=changeme1
+ENV SFTP_USER=USER \
+    SFTP_PASSWORD=PASSWORD
 
-# S3 configuration
-ENV S3_IDENTITY=EIDTME
-ENV S3_CREDENTIAL=EDITME
-ENV S3_BUCKET=EDITME
-# S3 key should start with a slash '/'
-ENV S3_KEY=/EDITME 
+# AWS configuration
+ENV AWS_ACCESS_KEY_ID=KEY_ID \
+    AWS_SECRET_ACCESS_KEY=ACCESS_KEY
+
+# S3 configuration. Note: key should start with a slash '/'
+ENV S3_BUCKET=BUCKET \
+    S3_KEY=/KEY
+
+# Key ID from AWS KMS. It should be created in bucket region. 
+ENV KMS_KEY_ID=
 
 ENV DEBIAN_FRONTEND=noninteractive 
 
 RUN apt-get update
-RUN apt-get -y install openssh-server
-RUN apt-get -y install automake autotools-dev g++ git libcurl4-gnutls-dev libfuse-dev libssl-dev libxml2-dev make pkg-config
+RUN apt-get -y install openssh-server automake autotools-dev g++ git \
+					   libcurl4-gnutls-dev libfuse-dev libssl-dev libxml2-dev make pkg-config
 RUN git clone https://github.com/s3fs-fuse/s3fs-fuse.git && \
 	cd s3fs-fuse && \
 	./autogen.sh && \
@@ -30,5 +34,4 @@ COPY entrypoint /
 RUN chmod +x /entrypoint 
 
 EXPOSE 22
-
 ENTRYPOINT ["/entrypoint"]
